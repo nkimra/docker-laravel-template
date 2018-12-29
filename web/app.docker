@@ -1,0 +1,19 @@
+FROM php:7.3.0-fpm
+
+COPY php.ini /usr/local/etc/php/
+
+RUN apt-get update -y && apt-get upgrade -y && apt-get install mysql-client git vim unzip zip -y
+RUN docker-php-ext-install mysqli pdo pdo_mysql 
+
+# install composer
+ENV COMPOSER_ALLOW_SUPERUSER 1
+ENV COMPOSER_HOME /composer
+ENV PATH $PATH:/composer/vendor/bin
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# install Laravel
+#RUN composer global require "laravel/installer"
+WORKDIR /var/www/html
+RUN composer create-project --prefer-dist laravel/laravel scraper "5.7.*"
+
+COPY env /var/www/html/scraper/.env
